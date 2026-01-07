@@ -14,18 +14,20 @@ RUN apk add --no-cache \
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /app
+# 👉 IMPORTANT : workspace Render
+WORKDIR /opt/render/project/src
 
 # Copier le projet
 COPY . .
 
-# Installer les dépendances PHP (sans dev)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Préparer Symfony en prod
+# Variables prod
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
+# Installer les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Préparer Symfony
 RUN php bin/console cache:clear --env=prod
 RUN php bin/console cache:warmup --env=prod
 
